@@ -91,19 +91,8 @@ func (strcmd *StrCmd) RemoveParser (typeName string) {
     delete(strcmd.parsers, typeName)
 }
 
-func (strcmd *StrCmd) SetParser (typeName string, parserFunc func(from string) (any, error)) error {
-    fType := reflect.TypeOf(parserFunc)
-    if fType.Kind() != reflect.Func {
-        return fmt.Errorf("supplied parserFunc is not a func")
-    }
-    if fType.NumOut() != 1 {
-        return fmt.Errorf("parserFunc must has only 1 return value")
-    }
-    if fType.Out(1) != reflect.TypeOf((*error)(nil)).Elem() {
-        return fmt.Errorf("retrun value of parserFunc must be of interface 'error'")
-    }
+func (strcmd *StrCmd) SetParser (typeName string, parserFunc func(from string) (any, error)) {
     strcmd.parsers[typeName] = parserFunc
-    return nil
 }
 
 func (strcmd *StrCmd) CallNamed(cmd string, functions map[string]any) error {
