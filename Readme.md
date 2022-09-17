@@ -2,6 +2,8 @@
 
 The reflection-based package allows users to call methods with automatically parsed parameters, with strings.
 
+The most common usecase is interactive cli that execute methods according to input from stdin.
+
 ```go
 func testInt(i1 int, i2 int) error {
 	fmt.Print(i1 + i2)
