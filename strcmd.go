@@ -119,6 +119,16 @@ func (strcmd *StrCmd) CallNamed(cmd string, functions map[string]any) error {
 	}
 }
 
+
+func (strcmd *StrCmd) SplitAndCall(function any, cmd string) (err error) {
+	splitted, err := strcmd.split(cmd)
+	if err != nil {
+		return err
+	}
+
+	return strcmd.Call(function, splitted)
+}
+
 // Call calls the function with the provided arguments automatically parsed.
 // Supported types of arguments can be extended by adding parser func to [Parsers].
 func (strcmd *StrCmd) Call(function any, args []string) (err error) {
