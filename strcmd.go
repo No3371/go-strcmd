@@ -61,6 +61,24 @@ func NewStrCmd () StrCmd {
 			reflect.TypeOf("").Name(): func(from string) (any, error) {
 				return from, nil
 			},
+			reflect.TypeOf(false).Name(): func(from string) (any, error) {
+				switch strings.ToLower(from) {
+				case "true":
+					fallthrough
+				case "1":
+					fallthrough
+				case "yes":
+					return true, nil
+				case "false":
+					fallthrough
+				case "0":
+					fallthrough
+				case "no":
+					return false, nil
+				default:
+					return false, fmt.Errorf("unexpected string for bool: %v", from)
+				}
+			},
 		},
 	}
 }
