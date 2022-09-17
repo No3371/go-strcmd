@@ -12,53 +12,57 @@ type StrCmd struct {
     strBuilder strings.Builder
 }
 
-var parsers map[string]func(from string) (any, error) = map[string]func(from string) (any, error){
-	reflect.TypeOf(int(0)).Name(): func(from string) (any, error) {
-		parsed, err := strconv.ParseInt(from, 10, 64)
-		if err != nil {
-			return nil, err
-		} else {
-			return int(parsed), nil
-		}
-	},
-	reflect.TypeOf(uint(0)).Name(): func(from string) (any, error) {
-		parsed, err := strconv.ParseUint(from, 10, 64)
-		if err != nil {
-			return nil, err
-		} else {
-			return uint(parsed), nil
-		}
-	},
-	reflect.TypeOf(int8(0)).Name(): func(from string) (any, error) {
-		return strconv.ParseInt(from, 10, 8)
-	},
-	reflect.TypeOf(int32(0)).Name(): func(from string) (any, error) {
-		return strconv.ParseInt(from, 10, 32)
-	},
-	reflect.TypeOf(int64(0)).Name(): func(from string) (any, error) {
-		return strconv.ParseInt(from, 10, 64)
-	},
-	reflect.TypeOf(uint8(0)).Name(): func(from string) (any, error) {
-		return strconv.ParseUint(from, 10, 8)
-	},
-	reflect.TypeOf(uint32(0)).Name(): func(from string) (any, error) {
-		return strconv.ParseUint(from, 10, 32)
-	},
-	reflect.TypeOf(uint64(0)).Name(): func(from string) (any, error) {
-		return strconv.ParseUint(from, 10, 64)
-	},
-	reflect.TypeOf(float32(0)).Name(): func(from string) (any, error) {
-		return strconv.ParseFloat(from, 32)
-	},
-	reflect.TypeOf(float64(0)).Name(): func(from string) (any, error) {
-		return strconv.ParseFloat(from, 64)
-	},
-	reflect.TypeOf(byte(0)).Name(): func(from string) (any, error) {
-		return strconv.ParseUint(from, 10, 8)
-	},
-	reflect.TypeOf("").Name(): func(from string) (any, error) {
-		return from, nil
-	},
+func NewStrCmd () StrCmd {
+	return StrCmd{
+		parsers: map[string]func(from string) (any, error){
+			reflect.TypeOf(int(0)).Name(): func(from string) (any, error) {
+				parsed, err := strconv.ParseInt(from, 10, 64)
+				if err != nil {
+					return nil, err
+				} else {
+					return int(parsed), nil
+				}
+			},
+			reflect.TypeOf(uint(0)).Name(): func(from string) (any, error) {
+				parsed, err := strconv.ParseUint(from, 10, 64)
+				if err != nil {
+					return nil, err
+				} else {
+					return uint(parsed), nil
+				}
+			},
+			reflect.TypeOf(int8(0)).Name(): func(from string) (any, error) {
+				return strconv.ParseInt(from, 10, 8)
+			},
+			reflect.TypeOf(int32(0)).Name(): func(from string) (any, error) {
+				return strconv.ParseInt(from, 10, 32)
+			},
+			reflect.TypeOf(int64(0)).Name(): func(from string) (any, error) {
+				return strconv.ParseInt(from, 10, 64)
+			},
+			reflect.TypeOf(uint8(0)).Name(): func(from string) (any, error) {
+				return strconv.ParseUint(from, 10, 8)
+			},
+			reflect.TypeOf(uint32(0)).Name(): func(from string) (any, error) {
+				return strconv.ParseUint(from, 10, 32)
+			},
+			reflect.TypeOf(uint64(0)).Name(): func(from string) (any, error) {
+				return strconv.ParseUint(from, 10, 64)
+			},
+			reflect.TypeOf(float32(0)).Name(): func(from string) (any, error) {
+				return strconv.ParseFloat(from, 32)
+			},
+			reflect.TypeOf(float64(0)).Name(): func(from string) (any, error) {
+				return strconv.ParseFloat(from, 64)
+			},
+			reflect.TypeOf(byte(0)).Name(): func(from string) (any, error) {
+				return strconv.ParseUint(from, 10, 8)
+			},
+			reflect.TypeOf("").Name(): func(from string) (any, error) {
+				return from, nil
+			},
+		},
+	}
 }
 
 func (strcmd *StrCmd) ClearParsers () {
@@ -119,7 +123,7 @@ func (strcmd *StrCmd) Call(function any, args []string) (err error) {
 
 	preparedArgs := make([]reflect.Value, 0, numIn)
 	for i := 0; i < numIn; i++ {
-		if parser, hasParser := parsers[fType.In(i).Name()]; !hasParser {
+		if parser, hasParser := strcmd.parsers[fType.In(i).Name()]; !hasParser {
 			return fmt.Errorf("no parser available for arg#%d (%s)", i, fType.In(i).Name())
 		} else {
 			parsed, pErr := parser(args[i])
